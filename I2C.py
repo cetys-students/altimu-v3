@@ -67,7 +67,7 @@ class I2C(object):
         :return: An unsigned value from two bytes.
         :rtype: int
         """
-        return ((high_byte & 0x0F) << 8) | (low_byte & 0x0F)
+        return ((high_byte & 0x00FF) << 8) | (low_byte & 0x00FF)
 
     def get_signed_value_from_bytes(self, low_byte, high_byte):
         """
