@@ -36,12 +36,13 @@ class AltIMUv3(I2C):
 
     def enable(self, accelerometer=True):
         if accelerometer:
-            self.write_register(LSM303D_Address, LSM303D.CTRL1, 0x57)
+            self.write_register(LSM303D_Address, LSM303D.CTRL1, 0xA7)
             self.write_register(LSM303D_Address, LSM303D.CTRL2, 0x00)
             self.is_accel_enabled = True
 
     def get_accelerometer_raw(self):
-        """ Return a 3D vector of raw accelerometer data.
+        """
+        Return a 3D vector of raw accelerometer data.
         """
 
         # Check if accelerometer has been enabled
@@ -49,3 +50,16 @@ class AltIMUv3(I2C):
             raise(Exception('Accelerometer is not enabled!'))
 
         return self.read_sensor(LSM303D_Address, self.accel_registers)
+
+    def get_accelerometer_cal(self):
+        """
+        Return a 3D vector of calibrated accelerometer data.
+        """
+        raw = self.get_accelerometer_raw()
+        scaling = 0.061 / 1000
+
+        cal_x = raw[0] * scaling
+        cal_y = raw[1] * scaling
+        cal_z = raw[2] * scaling
+
+        return [cal_x, cal_y, cal_z]
