@@ -32,7 +32,7 @@ for i in range(0, 1000):
     # print(f"LinearA\tx: {linear_acceleration[0]: .6f}\ty: {linear_acceleration[1]: .6f}\tz: {linear_acceleration[2]: .6f} [g]")
 
     samples.append(accel)
-    sleep(0.1)
+    sleep(0.01)
 
 graph_manager.add_data_set(name='ax (g)', y_values=samples, color='black', dash='solid')
 graph_manager.show()
