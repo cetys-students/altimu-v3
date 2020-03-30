@@ -20,27 +20,27 @@ for i in range(0, 1000):
     # Calibrated acceleration
     accel = altimu.get_accelerometer_cal()
 
-    # # Estimated gravity
-    # estimated_gravity = low_pass_filter.update_measurement(accel)
-    #
-    # # Estimated linear acceleration
+    # Estimated gravity
+    estimated_gravity = low_pass_filter.update_measurement(accel)
+
+    # Estimated linear acceleration
     # linear_x = accel[0] - estimated_gravity[0]
     # linear_y = accel[1] - estimated_gravity[1]
     # linear_z = accel[2] - estimated_gravity[2]
     # linear_acceleration = [linear_x, linear_y, linear_z]
 
-    print(f"Accel\tx: {accel[0]: .6f}\ty: {accel[1]: .6f}\tz: {accel[2]: .6f} [g]")
-    # print(f"Gravity\tx: {estimated_gravity[0]: .6f}\ty: {estimated_gravity[1]: .6f}\tz: {estimated_gravity[2]: .6f} [g]")
+    # print(f"Accel\tx: {accel[0]: .6f}\ty: {accel[1]: .6f}\tz: {accel[2]: .6f} [g]")
+    print(f"Gravity\tx: {estimated_gravity[0]: .6f}\ty: {estimated_gravity[1]: .6f}\tz: {estimated_gravity[2]: .6f} [g]")
     # print(f"LinearA\tx: {linear_acceleration[0]: .6f}\ty: {linear_acceleration[1]: .6f}\tz: {linear_acceleration[2]: .6f} [g]")
 
-    samples_x.append(accel[0])
-    samples_y.append(accel[1])
-    samples_z.append(accel[2])
+    samples_x.append(estimated_gravity[0])
+    samples_y.append(estimated_gravity[1])
+    samples_z.append(estimated_gravity[2])
     sleep(0.01)
 
-graph_manager.add_data_set(name='ax (g)', y_values=samples_x, color='red', dash='solid')
-graph_manager.add_data_set(name='ay (g)', y_values=samples_y, color='green', dash='solid')
-graph_manager.add_data_set(name='az (g)', y_values=samples_z, color='blue', dash='solid')
+graph_manager.add_data_set(name='gx (g)', y_values=samples_x, color='red', dash='solid')
+graph_manager.add_data_set(name='gy (g)', y_values=samples_y, color='green', dash='solid')
+graph_manager.add_data_set(name='gz (g)', y_values=samples_z, color='blue', dash='solid')
 graph_manager.show()
 
 # # Initialize a high pass filter with a default value and a bias of 80%
