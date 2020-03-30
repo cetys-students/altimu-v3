@@ -1,10 +1,14 @@
 from AltIMU_v3 import AltIMUv3
 from filters import LowPassFilter, HighPassFilter
 from time import sleep
+from plotter import Plotter
 
 # Setup Altimu
 altimu = AltIMUv3()
 altimu.enable()
+
+# Setup Plotter
+plotter = Plotter()
 
 # Initialize a low pass filter with a default value and a bias of 80%
 low_pass_filter = LowPassFilter([0.0, 0.0, 1.0], 0.8)
@@ -25,6 +29,9 @@ while True:
     print(f"Accel\tx: {accel[0]: .6f}\ty: {accel[1]: .6f}\tz: {accel[2]: .6f} [g]")
     print(f"Gravity\tx: {estimated_gravity[0]: .6f}\ty: {estimated_gravity[1]: .6f}\tz: {estimated_gravity[2]: .6f} [g]")
     print(f"LinearA\tx: {linear_acceleration[0]: .6f}\ty: {linear_acceleration[1]: .6f}\tz: {linear_acceleration[2]: .6f} [g]")
+
+    # Plot values
+    plotter.plot(linear_acceleration)
 
     sleep(0.1)
 
