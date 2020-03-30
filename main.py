@@ -13,7 +13,9 @@ graph_manager = GraphManager('Accelerometer Test', 'Time')
 # Initialize a low pass filter with a default value and a bias of 80%
 low_pass_filter = LowPassFilter([0.0, 0.0, 1.0], 0.8)
 
-samples = []
+samples_x = []
+samples_y = []
+samples_z = []
 for i in range(0, 1000):
     # Calibrated acceleration
     accel = altimu.get_accelerometer_cal()
@@ -31,12 +33,14 @@ for i in range(0, 1000):
     # print(f"Gravity\tx: {estimated_gravity[0]: .6f}\ty: {estimated_gravity[1]: .6f}\tz: {estimated_gravity[2]: .6f} [g]")
     # print(f"LinearA\tx: {linear_acceleration[0]: .6f}\ty: {linear_acceleration[1]: .6f}\tz: {linear_acceleration[2]: .6f} [g]")
 
-    samples.append(accel)
+    samples_x.append(accel[0])
+    samples_y.append(accel[1])
+    samples_z.append(accel[2])
     sleep(0.01)
 
-graph_manager.add_data_set(name='ax (g)', y_values=([s[0]] for s in samples), color='red', dash='solid')
-graph_manager.add_data_set(name='ay (g)', y_values=([s[1]] for s in samples), color='green', dash='solid')
-graph_manager.add_data_set(name='az (g)', y_values=([s[2]] for s in samples), color='blue', dash='solid')
+graph_manager.add_data_set(name='ax (g)', y_values=samples_x, color='red', dash='solid')
+graph_manager.add_data_set(name='ay (g)', y_values=samples_y, color='green', dash='solid')
+graph_manager.add_data_set(name='az (g)', y_values=samples_z, color='blue', dash='solid')
 graph_manager.show()
 
 # # Initialize a high pass filter with a default value and a bias of 80%
