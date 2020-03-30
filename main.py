@@ -34,9 +34,9 @@ for i in range(0, 1000):
     samples.append(accel)
     sleep(0.01)
 
-graph_manager.add_data_set(name='ax (g)', y_values=samples[0], color='red', dash='solid')
-graph_manager.add_data_set(name='ay (g)', y_values=samples[1], color='green', dash='solid')
-graph_manager.add_data_set(name='az (g)', y_values=samples[2], color='blue', dash='solid')
+graph_manager.add_data_set(name='ax (g)', y_values=([s[0]] for s in samples), color='red', dash='solid')
+graph_manager.add_data_set(name='ay (g)', y_values=([s[1]] for s in samples), color='green', dash='solid')
+graph_manager.add_data_set(name='az (g)', y_values=([s[2]] for s in samples), color='blue', dash='solid')
 graph_manager.show()
 
 # # Initialize a high pass filter with a default value and a bias of 80%
