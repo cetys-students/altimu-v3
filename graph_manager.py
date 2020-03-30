@@ -1,6 +1,6 @@
 import plotly.exceptions as py_exceptions
 import plotly.graph_objs as go
-import plotly as py
+import plotly.plotly as py
 
 
 class GraphManager:
