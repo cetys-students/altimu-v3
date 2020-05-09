@@ -53,10 +53,10 @@ class AltIMUv3(I2C):
         self.write_register(self.accel_mems.address, LSM303DRegisters.CTRL6, ctrl_6_value)
 
         # Gyro ODR Selection (800 Hz)
-        self.write_register(self.gyro_mems.address, L3GD20HRegisters.CTRL1, 0xC7)
+        self.write_register(self.gyro_mems.address, L3GD20HRegisters.CTRL1, 0xCF)
 
         # Gyro FS selection (2000 dps)
-        self.write_register(self.gyro_mems.address, L3GD20HRegisters.CTRL3, 0x30)
+        self.write_register(self.gyro_mems.address, L3GD20HRegisters.CTRL4, 0x30)
 
     def get_accelerometer_raw(self):
         """
@@ -87,15 +87,15 @@ class AltIMUv3(I2C):
         return self.read_sensor(self.gyro_mems.address,
                                 self.gyro_mems.axis_output_registers)
 
-    def get_gyro_cal(self):
+    def get_gyro_cal(self, bias=[0,0,0]):
         """
         Return a 3D vector of calibrated accelerometer data.
         """
         raw = self.get_gyro_raw()
         scaling = self.gyro_mems.gyro_scale.scaling_factor / 1000
 
-        cal_x = raw[0] * scaling
-        cal_y = raw[1] * scaling
-        cal_z = raw[2] * scaling
+        cal_x = (raw[0] * scaling) - bias
+        cal_y = (raw[1] * scaling) - bias
+        cal_z = (raw[2] * scaling) - bias
 
         return [cal_x, cal_y, cal_z]

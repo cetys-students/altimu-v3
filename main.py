@@ -1,54 +1,86 @@
+import math
 from AltIMU_v3 import AltIMUv3
 from filters import LowPassFilter, HighPassFilter
 from time import sleep
 from graph_manager import GraphManager
+
+print('Initializing...')
 
 # Setup Altimu
 altimu = AltIMUv3()
 altimu.enable()
 
 # Graph Manager
-graph_manager = GraphManager('Gyro Test', 'Time')
+graph_manager = GraphManager('Filter Test', 'Time')
 
-# Initialize a low pass filter with a default value and a bias of 80%
-low_pass_filter = LowPassFilter([0.0, 0.0, 1.0], 0.8)
+# Initialize angles
+alpha = 0
+beta = 0
+gamma = 0
 
-# Initialize a high pass filter with a default value and a bias of 80%
-high_pass_filter = HighPassFilter([0.0, 0.0, 0.0], 0.8)
+# Miscellaneous Properties
+sampling_period = 0.01
+bias = 0.98
 
-samples_x = []
-samples_y = []
-samples_z = []
+# Calibration procedure
+bias_gyro_x = 0
+bias_gyro_y = 0
+bias_gyro_z = 0
+calibration_data_samples = 500
+print('Calibrating...')
+for i in range(calibration_data_samples):
+    gyro = altimu.get_gyro_cal()
+    bias_gyro_x += gyro[0]
+    bias_gyro_y += gyro[1]
+    bias_gyro_z += gyro[2]
+    sleep(sampling_period)
+bias_gyro_x /= calibration_data_samples
+bias_gyro_y /= calibration_data_samples
+bias_gyro_z /= calibration_data_samples
+
+# Filtering procedure (Note, this would be real time data)
+gyro_angle_x_set = []
+gyro_angle_y_set = []
+accel_angle_x_set = []
+accel_angle_y_set = []
+comp_angle_x_set = []
+comp_angle_y_set = []
+print('Sampling...')
 for i in range(0, 1000):
 
-    # Calibrated Accelerometer
+    # Calibrated Readings
     accel = altimu.get_accelerometer_cal()
+    gyro = altimu.get_gyro_cal([bias_gyro_x, bias_gyro_y, bias_gyro_z])
 
-    # Estimated gravity
-    estimated_gravity = low_pass_filter.update_measurement(accel)
+    # Gyro Angles
+    gyro_angle_x = gyro[0] * sampling_period
+    gyro_angle_y = gyro[1] * sampling_period
+    gyro_angle_z = gyro[2] * sampling_period
 
-    # Estimated linear acceleration
-    linear_x = accel[0] - estimated_gravity[0]
-    linear_y = accel[1] - estimated_gravity[1]
-    linear_z = accel[2] - estimated_gravity[2]
+    # Accel Angles
+    accel_angle_x = math.atan2(accel[0], math.sqrt((accel[1] * accel[1]) + (accel[2] + accel[2])))
+    accel_angle_y = math.atan2(accel[1], math.sqrt((accel[0] * accel[0]) + (accel[2] + accel[2])))
 
-    # Calibrated Gyro
-    gyro = altimu.get_gyro_cal()
+    # Complementary Filter
+    alpha = alpha + gyro_angle_z
+    beta = bias * (beta + gyro_angle_x) + (1.0 - bias) * accel_angle_x
+    gamma = bias * (beta + gyro_angle_y) + (1.0 - bias) * accel_angle_y
 
-    # Undrifted Gyro
-    # undrifted_gyro = high_pass_filter.update_measurement(gyro)
+    gyro_angle_x_set.append(gyro_angle_x)
+    gyro_angle_y_set.append(gyro_angle_y)
+    accel_angle_x_set.append(accel_angle_x)
+    accel_angle_y_set.append(accel_angle_y)
+    comp_angle_x_set.append(beta)
+    comp_angle_y_set.append(gamma)
+    sleep(sampling_period)
 
-    # print(f"Accel\tx: {accel[0]: .6f}\ty: {accel[1]: .6f}\tz: {accel[2]: .6f} [g]")
-    # print(f"Gravity\tx: {estimated_gravity[0]: .6f}\ty: {estimated_gravity[1]: .6f}\tz: {estimated_gravity[2]: .6f} [g]")
-    # print(f"LinearA\tx: {linear_x: .6f}\ty: {linear_y: .6f}\tz: {linear_z: .6f} [g]")
-    print(f"gyro\tx: {gyro[0]: .6f}\ty: {gyro[1]: .6f}\tz: {gyro[2]: .6f} [dps]")
-
-    samples_x.append(gyro[0])
-    samples_y.append(gyro[1])
-    samples_z.append(gyro[2])
-    sleep(0.01)
-
-graph_manager.add_data_set(name='lax (g)', y_values=samples_x, color='red', dash='solid')
-graph_manager.add_data_set(name='lay (g)', y_values=samples_y, color='green', dash='solid')
-graph_manager.add_data_set(name='laz (g)', y_values=samples_z, color='blue', dash='solid')
+print('Generating plots...')
+graph_manager.add_data_set(name='gyro x', y_values=gyro_angle_x_set, color='blue', dash='solid')
+graph_manager.add_data_set(name='gyro y', y_values=gyro_angle_y_set, color='navy', dash='solid')
+graph_manager.add_data_set(name='accel x', y_values=accel_angle_x_set, color='green', dash='solid')
+graph_manager.add_data_set(name='accel y', y_values=accel_angle_y_set, color='lime', dash='solid')
+graph_manager.add_data_set(name='comp x', y_values=comp_angle_x_set, color='red', dash='solid')
+graph_manager.add_data_set(name='comp y', y_values=comp_angle_y_set, color='maroon', dash='solid')
 graph_manager.show()
+
+print('Done...')
