@@ -46,7 +46,7 @@ accel_angle_y_set = []
 comp_angle_x_set = []
 comp_angle_y_set = []
 print('Sampling...')
-for i in range(0, 1000):
+for i in range(1000):
 
     # Calibrated Readings
     accel = altimu.get_accelerometer_cal()

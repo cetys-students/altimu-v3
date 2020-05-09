@@ -94,8 +94,8 @@ class AltIMUv3(I2C):
         raw = self.get_gyro_raw()
         scaling = self.gyro_mems.gyro_scale.scaling_factor / 1000
 
-        cal_x = (raw[0] * scaling) - bias
-        cal_y = (raw[1] * scaling) - bias
-        cal_z = (raw[2] * scaling) - bias
+        cal_x = (raw[0] * scaling) - bias[0]
+        cal_y = (raw[1] * scaling) - bias[1]
+        cal_z = (raw[2] * scaling) - bias[2]
 
         return [cal_x, cal_y, cal_z]
