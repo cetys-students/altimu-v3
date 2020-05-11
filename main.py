@@ -1,6 +1,5 @@
 import math
 from AltIMU_v3 import AltIMUv3
-from filters import LowPassFilter, HighPassFilter
 from time import sleep
 from graph_manager import GraphManager
 
@@ -58,20 +57,22 @@ for i in range(1000):
     gyro_angle_z = gyro[2] * sampling_period
 
     # Accel Angles
-    accel_angle_x = math.atan2(accel[0], math.sqrt((accel[1] * accel[1]) + (accel[2] + accel[2])))
-    accel_angle_y = math.atan2(accel[1], math.sqrt((accel[0] * accel[0]) + (accel[2] + accel[2])))
+    accel_angle_x = math.atan2(accel[0], math.sqrt((accel[1] * accel[1]) + (accel[2] * accel[2])))
+    accel_angle_y = math.atan2(accel[1], math.sqrt((accel[0] * accel[0]) + (accel[2] * accel[2])))
 
     # Complementary Filter
     alpha = alpha + gyro_angle_z
     beta = bias * (beta + gyro_angle_x) + (1.0 - bias) * accel_angle_x
     gamma = bias * (beta + gyro_angle_y) + (1.0 - bias) * accel_angle_y
 
+    # Plotting Data Sets
     gyro_angle_x_set.append(gyro_angle_x)
     gyro_angle_y_set.append(gyro_angle_y)
     accel_angle_x_set.append(accel_angle_x)
     accel_angle_y_set.append(accel_angle_y)
     comp_angle_x_set.append(beta)
     comp_angle_y_set.append(gamma)
+
     sleep(sampling_period)
 
 print('Generating plots...')
